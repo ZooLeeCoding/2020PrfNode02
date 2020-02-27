@@ -2,7 +2,11 @@ const router = require('express').Router();
 const passport = require('passport');
 
 router.route('/pelda').get((req, res) => {
-    return res.status(200).send('igen, ez egy pelda');
+    if(req.isAuthenticated()) {
+        return res.status(200).send('igen, ez egy pelda');
+    } else {
+        return res.status(403).send('jelentkezz be előbb');
+    }
 }).post((req, res) => {
     return res.status(500).send('Ezt még nem implementáltuk');
 }).delete((req, res) => {

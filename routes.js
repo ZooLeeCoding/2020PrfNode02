@@ -29,6 +29,7 @@ router.route('/login').post((req, res) => {
 });
 
 router.route('/logout').post((req, res) => {
+    console.log(req.session.passport.user);
     if(req.isAuthenticated()) {
         req.logout();
         res.status(200).send("Kijelentkezés sikeres");

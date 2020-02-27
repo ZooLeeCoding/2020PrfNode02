@@ -1,20 +1,40 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const passport = require('passport');
+const localStrategy = require('passport-local').Strategy;
+const expressSession = require('express-session');
 
 const app = express();
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
-/* app.use('/', (req, res) => {
-    console.log(req.query); // http://localhost:3000/?q=10
-    res.status(200).send('this is the answer fro server: ' 
-    + (Number.parseInt(req.query.q)+1));
-}); */
+// ezekkel lépteti be a passport sessionbe a usert majd szedi ki onnan
+passport.serializeUser((user, done) => {
+    if(!user) return done("Hiba - nincs user", undefined);
+    return done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    if(!user) return done("Hiba - nincs user, akit kileptethetnenk", undefined);
+    return done(null, null);
+});
+
+passport.use('local', new localStrategy((username, password, done) => {
+    if(username === 'gipszjakab' && password === '12345') {
+        return done(null, {username: username});
+    } else {
+        return done("Hibás felhasználónév vagy jelszó", undefined);
+    }
+}));
+
+app.use(expressSession({secret: 'ezegyujabbprfgyakorlatmarnemtudokujsecretetkitalalni'}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', require('./routes'));
-app.use('/ezegymasik/', require('./routes'));
 
 app.listen(3000, () => {
     console.log('the server is running');
